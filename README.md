@@ -62,6 +62,13 @@ This guide provides step-by-step instructions for setting up PostgreSQL with Geo
     \q
     ```
 
+## Cloning repo
+
+```bash
+    git clone https://github.com/kushal-chaurasia/Geo-Django.git
+
+```
+
 ## Python Setup
 
 1. Add the DeadSnakes PPA for Python 3.9:
