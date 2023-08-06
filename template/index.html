@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place List</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <h1>Place List</h1>
+    <form id="search-form">
+        <input type="text" id="search-input" placeholder="Search for places">
+        <button type="submit">Search</button>
+    </form>
+    <div id="map" style="height: 500px;"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([0, 0], 2);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        const markers = L.markerClusterGroup();
+
+        fetch('/api/places/')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(place => {
+                    const marker = L.marker([place.coordinates[1], place.coordinates[0]]);
+                    marker.bindPopup(`<b>${place.name}</b><br>${place.description}`);
+                    markers.addLayer(marker);
+                });
+                map.addLayer(markers);
+            });
+
+        document.getElementById('search-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const searchInput = document.getElementById('search-input').value;
+            const response = await fetch(`/api/places/search/?query=${searchInput}`);
+            const data = await response.json();
+
+            markers.clearLayers();
+            data.forEach(place => {
+                const marker = L.marker([place.coordinates[1], place.coordinates[0]]);
+                marker.bindPopup(`<b>${place.name}</b><br>${place.description}`);
+                markers.addLayer(marker);
+            });
+            map.addLayer(markers);
+        });
+    </script>
+</body>
+</html>
